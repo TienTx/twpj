@@ -23,42 +23,43 @@ public class Test {
 
     private Twitter twitter;
 
-    public Test() throws TwitterException{
+    public Test() throws TwitterException {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
                 .setOAuthConsumerKey(Var.API_KEY)
                 .setOAuthConsumerSecret(Var.API_SECRET)
                 .setOAuthAccessToken(Var.ACCES_TOKEN)
-                .setOAuthAccessTokenSecret(Var.ACCES_TOKEN_SECRET);
-//                .setHttpProxyHost("localhost")
-//                .setHttpProxyPort(8080);
+                .setOAuthAccessTokenSecret(Var.ACCES_TOKEN_SECRET)
+                .setHttpProxyHost("159.203.2.1")
+                .setHttpProxyPort(8888);
         TwitterFactory factory = new TwitterFactory(cb.build());
         this.twitter = factory.getInstance();
-        System.out.println(twitter.getScreenName());
+//        System.out.println(twitter.getScreenName());
     }
 
     protected void waitUntilICanMakeAnotherCallUserTimeline() throws TwitterException, InterruptedException {
         Map<String, RateLimitStatus> temp = twitter.getRateLimitStatus();
-        RateLimitStatus temp2 = temp.get("/favorites/list");
-        System.out.println(temp2.getRemaining());
+        RateLimitStatus temp2 = temp.get("/statuses/home_timeline");
+        System.out.println("Remaining:" + temp2.getRemaining());
         if (temp2.getRemaining() == 0) {
             Thread.sleep((temp2.getSecondsUntilReset() + 5) * 1000);
             return;
         }
-        System.out.println(temp2.getSecondsUntilReset());
+        System.out.println("SecondsUntilReset:" + temp2.getSecondsUntilReset());
         int secondstosleep = 1 + temp2.getSecondsUntilReset() / temp2.getRemaining();
-        System.out.println(secondstosleep);
+        System.out.println("secondstosleep:" + secondstosleep);
         Thread.sleep(secondstosleep * 1000);
     }
 
     public void getFavorites(String user) throws TwitterException, InterruptedException {
         Paging pg = new Paging(500);
-        waitUntilICanMakeAnotherCallUserTimeline();
+//        waitUntilICanMakeAnotherCallUserTimeline();
 //        ResponseList<Status> statuses = twitter.getFavorites(user, 500);
 //        statuses.stream().forEach((sts) -> {
 //            System.out.println(sts.getText());
 //        });
-        ResponseList<Status> responseList = twitter.getFavorites(user, pg);
+        ResponseList<Status> responseList = twitter.getHomeTimeline(pg);
+        System.out.println(responseList.size());
         int i = 0;
         for (Status status : responseList) {
             System.out.println(++i + ":" + status.getText());
