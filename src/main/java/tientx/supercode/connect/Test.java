@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tientx.supercode.mavenproject1;
+package tientx.supercode.connect;
 
 import java.util.Map;
 import twitter4j.Paging;
